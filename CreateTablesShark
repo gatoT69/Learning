@@ -1,0 +1,64 @@
+
+CREATE DATABASE SharkDB;
+
+Use SharkDB;
+
+go
+
+CREATE TABLE País (
+    PaisID INT PRIMARY KEY IDENTITY,
+    Nombre NVARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Estado (
+    EstadoID INT PRIMARY KEY IDENTITY,
+    Nombre NVARCHAR(100) NOT NULL,
+    PaisID INT FOREIGN KEY REFERENCES País(PaisID)
+);
+
+CREATE TABLE Municipio (
+    MunicipioID INT PRIMARY KEY IDENTITY,
+    Nombre NVARCHAR(100) NOT NULL,
+    EstadoID INT FOREIGN KEY REFERENCES Estado(EstadoID)
+);
+
+CREATE TABLE Región (
+    RegionID INT PRIMARY KEY IDENTITY,
+    Nombre NVARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Cliente (
+    ClienteID INT PRIMARY KEY IDENTITY,
+    Nombre NVARCHAR(100) NOT NULL,
+    Direccion NVARCHAR(200),
+    MunicipioID INT FOREIGN KEY REFERENCES Municipio(MunicipioID)
+);
+
+CREATE TABLE Vendedor (
+    VendedorID INT PRIMARY KEY IDENTITY,
+    Nombre NVARCHAR(100) NOT NULL,
+    RegionID INT FOREIGN KEY REFERENCES Región(RegionID)
+);
+
+CREATE TABLE Producto (
+    ProductoID INT PRIMARY KEY IDENTITY,
+    Nombre NVARCHAR(100) NOT NULL,
+    Precio DECIMAL(10, 2) NOT NULL
+);
+
+CREATE TABLE Ventas (
+    FacturaID INT PRIMARY KEY IDENTITY,
+    Fecha DATE NOT NULL,
+    ClienteID INT FOREIGN KEY REFERENCES Cliente(ClienteID),
+    VendedorID INT FOREIGN KEY REFERENCES Vendedor(VendedorID),
+    Total DECIMAL(10, 2) NOT NULL
+);
+
+CREATE TABLE Venta_Producto (
+    VentaProductoID INT PRIMARY KEY IDENTITY,
+    FacturaID INT FOREIGN KEY REFERENCES Ventas(FacturaID),
+    ProductoID INT FOREIGN KEY REFERENCES Producto(ProductoID),
+    Cantidad INT NOT NULL,
+    PrecioUnitario DECIMAL(10, 2) NOT NULL,
+    Importe AS (Cantidad * PrecioUnitario) PERSISTED
+);
